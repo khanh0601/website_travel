@@ -263,3 +263,100 @@ if ( ! function_exists( 'hello_elementor_body_open' ) ) {
 		wp_body_open();
 	}
 }
+function tao_custom_post_type()
+{
+
+
+    /*
+     * Biến $label để chứa các text liên quan đến tên hiển thị của Post Type trong Admin
+     */
+    $label = array(
+        "name" => "All Tours", //Tên post type dạng số nhiều
+        "singular_name" => "Tour" //Tên post type dạng số ít
+    );
+
+
+    /*
+     * Biến $args là những tham số quan trọng trong Post Type
+     */
+    $args = array(
+        "labels" => $label, //Gọi các label trong biến $label ở trên
+        "description" => "Post type đăng bác sĩ", //Mô tả của post type
+        "supports" => array(
+            "title",
+            "editor",
+            "excerpt",
+            "author",
+            "thumbnail",
+            "comments",
+            "trackbacks",
+            "revisions",
+            "custom-fields"
+        ), //Các tính năng được hỗ trợ trong post type
+        "taxonomies" => array( "category", "post_tag" ), //Các taxonomy được phép sử dụng để phân loại nội dung
+        "hierarchical" => false, //Cho phép phân cấp, nếu là false thì post type này giống như Post, true thì giống như Page
+        "public" => true, //Kích hoạt post type
+        "show_ui" => true, //Hiển thị khung quản trị như Post/Page
+        "show_in_menu" => true, //Hiển thị trên Admin Menu (tay trái)
+        "show_in_nav_menus" => true, //Hiển thị trong Appearance -> Menus
+        "show_in_admin_bar" => true, //Hiển thị trên thanh Admin bar màu đen.
+        "menu_position" => 5, //Thứ tự vị trí hiển thị trong menu (tay trái)
+        "menu_icon" => "/wp-content/uploads/2024/01/world-tour-icon.svg", //Đường dẫn tới icon sẽ hiển thị
+        "can_export" => true, //Có thể export nội dung bằng Tools -> Export
+        "has_archive" => true, //Cho phép lưu trữ (month, date, year)
+        "exclude_from_search" => false, //Loại bỏ khỏi kết quả tìm kiếm
+        "publicly_queryable" => true, //Hiển thị các tham số trong query, phải đặt true
+        "capability_type" => "post" //
+    );
+
+
+    register_post_type("tour", $args); //Tạo post type với slug tên là sanpham và các tham số trong biến $args ở trên
+}
+/* Kích hoạt hàm tạo custom post type */
+add_action("init", "tao_custom_post_type");
+
+function custom_post_type_labels($labels) {
+	$labels->add_new = 'Add New Tour';
+	return $labels;
+}
+
+add_filter('post_type_labels_tour', 'custom_post_type_labels');
+
+add_filter('pre_get_posts','lay_custom_post_type');
+function lay_custom_post_type($query) {
+  if (is_home() && $query->is_main_query ())
+    $query->set ('post_type', array ('post','Tour'));
+    return $query;
+}
+
+function tao_taxonomy_custom() {
+	$labels = array(
+			'name' => 'Categories_Tour', // Tên của taxonomy
+			'singular_name' => 'Category_Tour', // Tên số ít
+			'search_items' => 'Search Categories Tour',
+			'all_items' => 'All Categories Tour',
+			'parent_item' => 'Parent Category Tour',
+			'parent_item_colon' => 'Parent Category Tour:',
+			'edit_item' => 'Edit Category Tour',
+			'update_item' => 'Update Category Tour',
+			'add_new_item' => 'Add New Category Tour',
+			'new_item_name' => 'New Category Tour Name',
+			'menu_name' => 'Categories Tour',
+	);
+
+	$args = array(
+			'hierarchical' => true, // Nếu bạn muốn taxonomy này có cấp độ cha con
+			'labels' => $labels,
+			'show_ui' => true,
+			'show_admin_column' => true,
+			'query_var' => true,
+			'rewrite' => array('slug' => 'category-Tour'), // Định nghĩa slug của taxonomy
+	);
+
+	register_taxonomy('category-tour', array('tour'), $args); // Kết nối taxonomy với post type "Tour"
+}
+add_action('init', 'tao_taxonomy_custom');
+function remove_category_from_Tour_post_type() {
+	unregister_taxonomy_for_object_type('category', 'tour');
+}
+add_action('init', 'remove_category_from_Tour_post_type');

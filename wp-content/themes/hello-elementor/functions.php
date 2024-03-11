@@ -360,3 +360,12 @@ function remove_category_from_Tour_post_type() {
 	unregister_taxonomy_for_object_type('category', 'tour');
 }
 add_action('init', 'remove_category_from_Tour_post_type');
+function add_custom_css() {
+	wp_enqueue_style( 'swiper-css', 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css' );
+}
+add_action( 'wp_enqueue_scripts', 'add_custom_css' );
+function add_custom_js() {
+	wp_enqueue_script( 'swiper-js', 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js', array(), false, false );
+	wp_enqueue_script( 'swiper-js', 'https://code.jquery.com/jquery-3.7.1.min.js', array(), false, false );
+}
+add_action( 'wp_enqueue_scripts', 'add_custom_js' );
